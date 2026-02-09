@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  username      String       @unique
+  passwordHash  String
+  avatar        String?
+  oauthProvider String?
+  oauthId       String?
+  role          UserRole     @default(PLAYER)
+  bannedUntil   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  gamePlayers   GamePlayer[]
+  messages      Message[]
+  stats         UserStats?
+  notifications Notification[]
+
+  @@unique([oauthProvider, oauthId])
+}
+
+enum UserRole {
+  ADMIN
+  PLAYER
+}
+
+model UserStats {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gamesPlayed      Int      @default(0)
+  gamesWon         Int      @default(0)
+  totalPlaytimeMin Int      @default(0)
+  favoriteScenario String?
+  updatedAt        DateTime @updatedAt
+}
+
+model Game {
+  id            String       @id @default(uuid())
+  code          String       @unique
+  scenarioSlug  String
+  status        GameStatus   @default(LOBBY)
+  currentPhase  GamePhase    @default(WAITING)
+  currentRound  Int          @default(0)
+  maxRounds     Int          @default(6)
+  maxPlayers    Int          @default(6)
+  turnTimeout   Int          @default(60)
+  isPrivate     Boolean      @default(false)
+  hostId        String
+  stateSnapshot Json?
+  createdAt     DateTime     @default(now())
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  players       GamePlayer[]
+  events        GameEvent[]
+  messages      Message[]
+}
+
+enum GameStatus {
+  LOBBY
+  IN_PROGRESS
+  PAUSED
+  FINISHED
+  CANCELLED
+}
+
+enum GamePhase {
+  WAITING
+  NARRATION
+  ACTION
+  DISCUSSION
+  VOTE
+  RESOLUTION
+}
+
+model GamePlayer {
+  id       String   @id @default(uuid())
+  gameId   String
+  game     Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  role     String?
+  isAlive  Boolean  @default(true)
+  isHost   Boolean  @default(false)
+  score    Int      @default(0)
+  data     Json?
+  joinedAt DateTime @default(now())
+
+  @@unique([gameId, userId])
+}
+
+model GameEvent {
+  id        String    @id @default(uuid())
+  gameId    String
+  game      Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  round     Int
+  phase     GamePhase
+  type      String
+  actorId   String?
+  data      Json?
+  narrative String?
+  createdAt DateTime  @default(now())
+}
+
+model Message {
+  id          String      @id @default(uuid())
+  gameId      String
+  game        Game        @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  content     String
+  type        MessageType @default(CHAT)
+  recipientId String?
+  createdAt   DateTime    @default(now())
+}
+
+enum MessageType {
+  CHAT
+  SYSTEM
+  AI_NARRATION
+  ACTION
+  VOTE
+  WHISPER
+}
+
+enum NotificationType {
+  GAME_INVITE
+  GAME_STARTED
+  TURN_ACTION
+  GAME_FINISHED
+  SYSTEM
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, isRead])
+}
