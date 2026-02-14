@@ -12,6 +12,7 @@ import { WebsocketModule } from './websocket/websocket.module';
 import { CacheModule } from './cache/cache.module';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     WebsocketModule,
     AdminModule,
     NotificationsModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
