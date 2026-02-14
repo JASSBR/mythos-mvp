@@ -1,0 +1,97 @@
+{
+  "slug": "deep",
+  "name": "DEEP",
+  "description": "Equipage d'un sous-marin en detresse. Cooperez pour survivre aux crises et atteindre les profondeurs abyssales.",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "duration": "20-30 min",
+  "difficulty": "difficile",
+  "maxRounds": 8,
+  "roles": [
+    {
+      "id": "commandant",
+      "name": "Commandant",
+      "team": "equipage",
+      "description": "Vous dirigez le sous-marin. Vos decisions influencent la trajectoire et le moral.",
+      "unique": true,
+      "required": true
+    },
+    {
+      "id": "ingenieur",
+      "name": "Ingenieur",
+      "team": "equipage",
+      "description": "Vous reparee les systemes et gerez la distribution d'energie.",
+      "unique": true,
+      "required": true
+    },
+    {
+      "id": "medecin",
+      "name": "Medecin",
+      "team": "equipage",
+      "description": "Vous soignez l'equipage et surveillez les reserves d'oxygene.",
+      "unique": true,
+      "required": false
+    },
+    {
+      "id": "plongeur",
+      "name": "Plongeur",
+      "team": "equipage",
+      "description": "Vous effectuez les sorties sous-marines pour reparer la coque et explorer.",
+      "unique": false,
+      "required": false
+    }
+  ],
+  "phases": ["NARRATION", "ACTION", "DISCUSSION", "VOTE", "RESOLUTION"],
+  "actions": [
+    "Reparer la coque",
+    "Redistribuer l'energie",
+    "Recharger l'oxygene",
+    "Plonger plus profond",
+    "Stabiliser le sous-marin",
+    "Explorer l'environnement"
+  ],
+  "gauges": [
+    {
+      "id": "o2",
+      "name": "Oxygene",
+      "min": 0,
+      "max": 100,
+      "initial": 90,
+      "appliesTo": "global"
+    },
+    {
+      "id": "energie",
+      "name": "Energie",
+      "min": 0,
+      "max": 100,
+      "initial": 80,
+      "appliesTo": "global"
+    },
+    {
+      "id": "coque",
+      "name": "Coque",
+      "min": 0,
+      "max": 100,
+      "initial": 85,
+      "appliesTo": "global"
+    },
+    {
+      "id": "profondeur",
+      "name": "Profondeur",
+      "min": 0,
+      "max": 8000,
+      "initial": 500,
+      "appliesTo": "global"
+    }
+  ],
+  "winConditions": {
+    "equipage": "Atteindre la profondeur maximale (8000m) avec toutes les jauges > 0 au dernier round",
+    "defaite": "Une jauge critique (O2, Energie ou Coque) tombe a 0"
+  },
+  "aiPrompt": {
+    "systemPrompt": "Tu es l'ordinateur de bord du sous-marin DEEP-7. Tu narres les evenements avec tension et realisme. L'equipage coopere pour atteindre les profondeurs abyssales. A chaque round, la profondeur augmente et de nouvelles crises surviennent. Decris l'environnement claustrophobique, les creatures des profondeurs, et les defaillances du sous-marin. Reponds en francais.",
+    "introPrompt": "Le sous-marin DEEP-7 entame sa descente vers les abysses. L'equipage est pret. Decris la scene d'ouverture: le depart du port sous-marin, les premieres lueurs qui disparaissent, et les premiers signes que la mission sera dangereuse. Profondeur actuelle: 500m.",
+    "roundPrompt": "Round {round}/{maxRounds}. Profondeur: {profondeur}m. O2: {o2}%, Energie: {energie}%, Coque: {coque}%. Actions des joueurs: {actions}. Narre les consequences des actions. La profondeur augmente, de nouvelles menaces apparaissent. L'equipage doit cooperer pour survivre.",
+    "epiloguePrompt": "La mission est terminee. Resultat: {result}. Ecris un epilogue decrivant le sort de l'equipage et du sous-marin DEEP-7."
+  }
+}

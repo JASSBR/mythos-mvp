@@ -1,0 +1,96 @@
+{
+  "slug": "tribunal",
+  "name": "TRIBUNAL",
+  "description": "Proces medieval -- Jures, Avocats et Accuse. Qui dit la verite ?",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "duration": "20 min",
+  "difficulty": "normal",
+  "maxRounds": 5,
+  "roles": [
+    {
+      "id": "accuse",
+      "name": "Accuse",
+      "team": "defense",
+      "description": "Vous etes accuse d'un crime. Convainquez le jury de votre innocence.",
+      "unique": true,
+      "required": true
+    },
+    {
+      "id": "avocat_defense",
+      "name": "Avocat de la Defense",
+      "team": "defense",
+      "description": "Defendez l'accuse. Trouvez des arguments et des preuves.",
+      "unique": true,
+      "required": true
+    },
+    {
+      "id": "avocat_accusation",
+      "name": "Avocat de l'Accusation",
+      "team": "accusation",
+      "description": "Prouvez la culpabilite de l'accuse.",
+      "unique": true,
+      "required": true
+    },
+    {
+      "id": "jure",
+      "name": "Jure",
+      "team": "neutre",
+      "description": "Ecoutez les arguments et votez en votre ame et conscience.",
+      "unique": false,
+      "required": false
+    },
+    {
+      "id": "temoin",
+      "name": "Temoin",
+      "team": "neutre",
+      "description": "Vous avez vu quelque chose. Mais direz-vous la verite ?",
+      "unique": false,
+      "required": false
+    },
+    {
+      "id": "juge",
+      "name": "Juge",
+      "team": "neutre",
+      "description": "Vous presidez le proces et maintenez l'ordre.",
+      "unique": true,
+      "required": false
+    }
+  ],
+  "phases": ["NARRATION", "ACTION", "VOTE", "RESOLUTION"],
+  "actions": [
+    "Presenter un argument",
+    "Interroger un temoin",
+    "Chercher des preuves",
+    "Contester un temoignage",
+    "Faire une declaration solennelle"
+  ],
+  "gauges": [
+    {
+      "id": "credibilite",
+      "name": "Credibilite",
+      "min": 0,
+      "max": 100,
+      "initial": 50,
+      "appliesTo": "all"
+    },
+    {
+      "id": "tension",
+      "name": "Tension",
+      "min": 0,
+      "max": 100,
+      "initial": 30,
+      "appliesTo": "global"
+    }
+  ],
+  "winConditions": {
+    "defense": "L'accuse est acquitte (majorite des jures votent non-coupable)",
+    "accusation": "L'accuse est reconnu coupable (majorite des jures votent coupable)"
+  },
+  "aiPrompt": {
+    "systemPrompt": "Tu es le Maitre du Jeu d'un proces medieval interactif. Tu narres les evenements du tribunal avec un style dramatique et immersif. Tu arbitres les actions des joueurs et tu fais evoluer l'intrigue en fonction de leurs choix. Maintiens la tension narrative. Reponds en francais.",
+    "introPrompt": "Commence le proces. Decris le tribunal, l'atmosphere, et presente l'accuse et les charges retenues contre lui. Attribue un crime fictif interessant et ambigu.",
+    "roundPrompt": "Round {round}/{maxRounds}. Resume les actions du dernier tour et narre la suite du proces. Augmente la tension. Actions des joueurs: {actions}",
+    "epiloguePrompt": "Le proces est termine. Le verdict est: {verdict}. Ecris un epilogue dramatique revelant la verite sur l'affaire."
+  }
+}
