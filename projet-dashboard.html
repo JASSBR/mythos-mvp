@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYTHOS — Dashboard Projet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0f1117;
+      --bg-secondary: #1a1d27;
+      --bg-card: #222632;
+      --bg-card-hover: #2a2e3c;
+      --accent: #6c5ce7;
+      --accent-light: #a29bfe;
+      --accent-glow: rgba(108, 92, 231, 0.3);
+      --green: #00b894;
+      --green-light: #55efc4;
+      --red: #ff6b6b;
+      --orange: #fdcb6e;
+      --yellow: #ffeaa7;
+      --blue: #74b9ff;
+      --pink: #fd79a8;
+      --text-primary: #f0f0f5;
+      --text-secondary: #a0a3b1;
+      --text-muted: #6b6e7d;
+      --border: #2d3140;
+      --sidebar-width: 260px;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 15px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 3px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 4px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 10px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-nav a:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    .sidebar-nav a.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .sidebar-nav a .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    section {
+      padding: 60px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      margin-bottom: 40px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-light);
+      background: rgba(108, 92, 231, 0.15);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 600px;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding: 80px 48px;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1535 50%, var(--bg-primary) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 184, 148, 0.15);
+      border: 1px solid rgba(0, 184, 148, 0.3);
+      color: var(--green-light);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-tagline {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metric-accent { color: var(--accent-light); }
+    .metric-green { color: var(--green-light); }
+    .metric-orange { color: var(--orange); }
+    .metric-blue { color: var(--blue); }
+
+    /* ===== SCORE GAUGE ===== */
+    .score-container {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-top: 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      max-width: 500px;
+    }
+
+    .score-ring {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+
+    .score-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-ring-bg {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 6;
+    }
+
+    .score-ring-fill {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 226;
+      stroke-dashoffset: 23;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .score-value {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .score-details .score-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .score-details .score-status {
+      font-size: 0.85rem;
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    /* ===== TIMELINE ===== */
+    .timeline-container {
+      overflow-x: auto;
+      padding-bottom: 20px;
+    }
+
+    .timeline {
+      display: flex;
+      min-width: 1000px;
+      gap: 0;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 50px;
+      left: 24px;
+      right: 24px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      z-index: 0;
+    }
+
+    .timeline-progress {
+      position: absolute;
+      top: 50px;
+      left: 24px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 2px;
+      z-index: 1;
+      width: 50%;
+      transition: width 1s ease;
+    }
+
+    .sprint-block {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      padding: 0 8px;
+    }
+
+    .sprint-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--border);
+      border: 3px solid var(--bg-primary);
+      margin: 42px auto 16px;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .sprint-block.active .sprint-dot {
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      width: 24px;
+      height: 24px;
+      margin-top: 40px;
+    }
+
+    .sprint-block.completed .sprint-dot {
+      background: var(--green);
+    }
+
+    .sprint-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .sprint-weeks {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .sprint-deliverable {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      margin-top: 8px;
+    }
+
+    .sprint-milestone {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .milestone-poc { background: rgba(108, 92, 231, 0.2); color: var(--accent-light); }
+    .milestone-alpha { background: rgba(116, 185, 255, 0.2); color: var(--blue); }
+    .milestone-beta { background: rgba(253, 203, 110, 0.2); color: var(--orange); }
+    .milestone-rc { background: rgba(253, 121, 168, 0.2); color: var(--pink); }
+    .milestone-prod { background: rgba(0, 184, 148, 0.2); color: var(--green-light); }
+
+    /* ===== TEAM ===== */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .team-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .team-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0 auto 16px;
+      color: white;
+    }
+
+    .team-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .team-role {
+      font-size: 0.8rem;
+      color: var(--accent-light);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .team-hours {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .team-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .skill-tag {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      background: rgba(108, 92, 231, 0.12);
+      border: 1px solid rgba(108, 92, 231, 0.25);
+      border-radius: 12px;
+      color: var(--accent-light);
+    }
+
+    /* ===== ARCHITECTURE ===== */
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .arch-layer {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      min-width: 180px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .arch-layer:hover {
+      transform: scale(1.03);
+    }
+
+    .arch-layer-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .arch-layer-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .arch-layer-techs {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .arch-tech {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      padding: 3px 8px;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+    }
+
+    .arch-arrow {
+      font-size: 1.8rem;
+      color: var(--accent-light);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .arch-protocols {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .protocol-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .protocol-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* ===== GAME LOOP ===== */
+    .gameloop-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .gameloop-visual {
+      flex: 1;
+      min-width: 340px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .loop-circle {
+      position: relative;
+      width: 340px;
+      height: 340px;
+    }
+
+    .loop-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .loop-center-icon {
+      font-size: 2.5rem;
+      margin-bottom: 4px;
+    }
+
+    .loop-center-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .loop-phase {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-align: center;
+    }
+
+    .loop-phase:hover {
+      transform: scale(1.12);
+    }
+
+    .loop-phase-icon { font-size: 1.3rem; margin-bottom: 2px; }
+    .loop-phase-name { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .phase-setup { top: 0; left: 50%; transform: translateX(-50%); background: rgba(108,92,231,0.15); border-color: var(--accent); color: var(--accent-light); }
+    .phase-narration { top: 15%; right: 0; background: rgba(116,185,255,0.15); border-color: var(--blue); color: var(--blue); }
+    .phase-action { bottom: 15%; right: 0; background: rgba(253,203,110,0.15); border-color: var(--orange); color: var(--orange); }
+    .phase-resolution { bottom: 0; left: 50%; transform: translateX(-50%); background: rgba(253,121,168,0.15); border-color: var(--pink); color: var(--pink); }
+    .phase-discussion { bottom: 15%; left: 0; background: rgba(0,184,148,0.15); border-color: var(--green); color: var(--green-light); }
+    .phase-finale { top: 15%; left: 0; background: rgba(255,107,107,0.15); border-color: var(--red); color: var(--red); }
+
+    .gameloop-details {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .phase-detail {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 3px solid;
+    }
+
+    .phase-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .phase-detail-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .phase-detail-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ===== SCENARIOS ===== */
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .scenario-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .scenario-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .scenario-card.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .scenario-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-mvp { background: rgba(0,184,148,0.2); color: var(--green-light); }
+    .badge-post { background: rgba(107,110,125,0.3); color: var(--text-muted); }
+
+    .scenario-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .scenario-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .scenario-theme {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .scenario-mechanics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mechanic-tag {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      color: var(--text-secondary);
+    }
+
+    /* ===== RISKS ===== */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .risk-chart-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .risk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .risk-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      border-left: 4px solid;
+    }
+
+    .risk-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .risk-item-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .risk-score {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 10px;
+    }
+
+    .risk-critical { border-left-color: var(--red); }
+    .risk-critical .risk-score { background: rgba(255,107,107,0.2); color: var(--red); }
+    .risk-high { border-left-color: var(--orange); }
+    .risk-high .risk-score { background: rgba(253,203,110,0.2); color: var(--orange); }
+    .risk-medium { border-left-color: var(--yellow); }
+    .risk-medium .risk-score { background: rgba(255,234,167,0.2); color: var(--yellow); }
+
+    .risk-mitigation {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ===== CHARTS ===== */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .chart-canvas-wrapper {
+      position: relative;
+      height: 280px;
+    }
+
+    /* ===== BUDGET ===== */
+    .budget-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .budget-total {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .budget-amount {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--green-light);
+      margin-bottom: 4px;
+    }
+
+    .budget-label {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ===== KPIs ===== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .kpi-icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .kpi-name {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .kpi-target {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .kpi-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .kpi-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* ===== BACKLOG ===== */
+    .backlog-epics {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .epic-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .epic-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .epic-header:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .epic-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .epic-count {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: var(--bg-primary);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .epic-arrow {
+      transition: transform 0.2s;
+      color: var(--text-muted);
+    }
+
+    .epic-group.open .epic-arrow {
+      transform: rotate(180deg);
+    }
+
+    .epic-stories {
+      display: none;
+      padding: 12px 20px;
+    }
+
+    .epic-group.open .epic-stories {
+      display: block;
+    }
+
+    .story-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .story-item:last-child {
+      border-bottom: none;
+    }
+
+    .story-priority {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .priority-must { background: rgba(255,107,107,0.2); color: var(--red); }
+    .priority-should { background: rgba(253,203,110,0.2); color: var(--orange); }
+    .priority-could { background: rgba(116,185,255,0.2); color: var(--blue); }
+    .priority-wont { background: rgba(107,110,125,0.3); color: var(--text-muted); }
+
+    /* ===== KANBAN ===== */
+    .kanban-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .kanban-filter {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .kanban-filter:hover, .kanban-filter.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 16px;
+    }
+
+    .kanban-sprint-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .kanban-column {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-height: 400px;
+      max-height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kanban-col-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .kanban-col-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kanban-col-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .kanban-col-count {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: var(--bg-primary);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .kanban-cards {
+      padding: 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .kanban-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      cursor: grab;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .kanban-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .kanban-card.dragging {
+      opacity: 0.5;
+      transform: rotate(2deg);
+    }
+
+    .kanban-card-labels {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .kanban-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .label-frontend { background: rgba(116,185,255,0.2); color: var(--blue); }
+    .label-backend { background: rgba(0,184,148,0.2); color: var(--green-light); }
+    .label-ia { background: rgba(108,92,231,0.2); color: var(--accent-light); }
+    .label-devops { background: rgba(253,121,168,0.2); color: var(--pink); }
+    .label-design { background: rgba(253,203,110,0.2); color: var(--orange); }
+    .label-game { background: rgba(255,107,107,0.2); color: var(--red); }
+    .label-doc { background: rgba(178,190,195,0.2); color: #b2bec3; }
+    .label-tests { background: rgba(0,206,209,0.2); color: #00ced1; }
+
+    .kanban-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .kanban-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kanban-card-sprint {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .kanban-card-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kanban-card-points {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      background: var(--bg-secondary);
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 1400px) {
+      .kanban-board {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .kanban-board {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .kanban-board {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== COMPLIANCE ===== */
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .compliance-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .compliance-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .compliance-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .compliance-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .compliance-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .compliance-status {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 12px;
+      border-radius: 10px;
+      background: rgba(0,184,148,0.15);
+      color: var(--green-light);
+    }
+
+    /* ===== MOBILE MENU ===== */
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 200;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .risk-grid, .budget-grid, .chart-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .mobile-toggle {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      section {
+        padding: 40px 20px;
+      }
+
+      .hero {
+        padding: 60px 20px;
+      }
+
+      .hero-title {
+        font-size: 2.2rem;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .arch-diagram {
+        flex-direction: column;
+      }
+
+      .arch-arrow {
+        transform: rotate(90deg);
+      }
+
+      .gameloop-wrapper {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">MYTHOS</div>
+      <div class="sidebar-subtitle">Dashboard Projet</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="#hero" class="active"><span class="nav-icon">&#9670;</span> Vue d'ensemble</a>
+      <a href="#timeline"><span class="nav-icon">&#9200;</span> Timeline</a>
+      <a href="#team"><span class="nav-icon">&#9824;</span> Equipe</a>
+      <a href="#architecture"><span class="nav-icon">&#9881;</span> Architecture</a>
+      <a href="#gameloop"><span class="nav-icon">&#9654;</span> Game Loop</a>
+      <a href="#scenarios"><span class="nav-icon">&#9813;</span> Scenarios</a>
+      <a href="#risks"><span class="nav-icon">&#9888;</span> Risques</a>
+      <a href="#competitive"><span class="nav-icon">&#9733;</span> Concurrence</a>
+      <a href="#budget"><span class="nav-icon">&#8364;</span> Budget</a>
+      <a href="#kpis"><span class="nav-icon">&#9632;</span> KPIs</a>
+      <a href="#backlog"><span class="nav-icon">&#9776;</span> Backlog</a>
+      <a href="#kanban"><span class="nav-icon">&#9638;</span> Kanban</a>
+      <a href="#compliance"><span class="nav-icon">&#10003;</span> Conformite</a>
+    </div>
+    <div class="sidebar-footer">
+      5AWD Workshop &mdash; Samy, Yassir, Youri, Kays<br>
+      Fevrier 2026
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- ===== HERO ===== -->
+    <section id="hero" class="hero">
+      <div class="hero-content fade-in">
+        <div class="hero-badge">&#9679; MVP DEPLOYE</div>
+        <h1 class="hero-title">MYTHOS</h1>
+        <p class="hero-tagline">Plateforme de jeu narratif multijoueur propulsee par IA. Un Maitre du Jeu IA orchestre des sessions immersives de 15-25 minutes pour 2 a 8 joueurs.</p>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-value metric-accent">4</div>
+            <div class="metric-label">Membres d'equipe</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-green">14</div>
+            <div class="metric-label">Semaines de dev</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-orange">308&euro;</div>
+            <div class="metric-label">Budget MVP</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value metric-blue">2</div>
+            <div class="metric-label">Scenarios MVP</div>
+          </div>
+        </div>
+
+        <div class="score-container">
+          <div class="score-ring">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle class="score-ring-bg" cx="40" cy="40" r="36" />
+              <circle class="score-ring-fill" cx="40" cy="40" r="36" />
+            </svg>
+            <div class="score-value">4.5</div>
+          </div>
+          <div class="score-details">
+            <div class="score-label">Score de Faisabilite</div>
+            <div class="score-status" style="color: var(--green-light);">&#10003; MVP en production &mdash; deploye sur Vercel + Render</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TIMELINE ===== -->
+    <section id="timeline">
+      <div class="section-header fade-in">
+        <div class="section-tag">Planning</div>
+        <h2 class="section-title">Timeline du Projet</h2>
+        <p class="section-desc">7 sprints de 2 semaines sur 14 semaines, de janvier a avril 2026.</p>
+      </div>
+      <div class="timeline-container fade-in">
+        <div class="timeline">
+          <div class="timeline-progress"></div>
+          <div class="sprint-block completed">
+            <div class="sprint-name">Sprint 0</div>
+            <div class="sprint-weeks">Sem. 1-2</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">Archi, Design System, DB, Auth, POC Claude, Landing page</div>
+            <span class="sprint-milestone milestone-poc">POC Gate</span>
+          </div>
+          <div class="sprint-block completed">
+            <div class="sprint-name">Sprint 1</div>
+            <div class="sprint-weeks">Sem. 3-4</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">Game CRUD, Cache, WebSocket, Lobby, Dashboard, CI/CD</div>
+            <span class="sprint-milestone milestone-alpha">Alpha</span>
+          </div>
+          <div class="sprint-block completed">
+            <div class="sprint-name">Sprint 2</div>
+            <div class="sprint-weeks">Sem. 5-6</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">Scenarios, Game Engine, Game UI, Admin, Notifications</div>
+            <span class="sprint-milestone milestone-beta">Beta Closed</span>
+          </div>
+          <div class="sprint-block active">
+            <div class="sprint-name">Sprint 3</div>
+            <div class="sprint-weeks">Sem. 7-8</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">TRIBUNAL jouable, DEEP ressources</div>
+            <span class="sprint-milestone milestone-beta">Beta Open</span>
+          </div>
+          <div class="sprint-block">
+            <div class="sprint-name">Sprint 4</div>
+            <div class="sprint-weeks">Sem. 9-10</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">Integration, bugfix, tests utilisateurs</div>
+            <span class="sprint-milestone milestone-rc">Release Candidate</span>
+          </div>
+          <div class="sprint-block">
+            <div class="sprint-name">Sprint 5</div>
+            <div class="sprint-weeks">Sem. 11-12</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">Polish, accessibilite, deploiement prod</div>
+            <span class="sprint-milestone milestone-prod">Production</span>
+          </div>
+          <div class="sprint-block">
+            <div class="sprint-name">Buffer</div>
+            <div class="sprint-weeks">Sem. 13-14</div>
+            <div class="sprint-dot"></div>
+            <div class="sprint-deliverable">Stabilisation, docs, preparation soutenance</div>
+            <span class="sprint-milestone milestone-prod">Livraison</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TEAM ===== -->
+    <section id="team">
+      <div class="section-header fade-in">
+        <div class="section-tag">Equipe</div>
+        <h2 class="section-title">Membres & Roles</h2>
+        <p class="section-desc">4 personnes, 97 heures/semaine de capacite totale.</p>
+      </div>
+      <div class="team-grid fade-in">
+        <div class="team-card">
+          <div class="team-avatar" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">K</div>
+          <div class="team-name">Kays</div>
+          <div class="team-role">PO / Architecte</div>
+          <div class="team-hours">25h / semaine</div>
+          <div class="team-skills">
+            <span class="skill-tag">Vision produit</span>
+            <span class="skill-tag">Architecture</span>
+            <span class="skill-tag">Backlog</span>
+            <span class="skill-tag">Veille marche</span>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+          <div class="team-name">Samy</div>
+          <div class="team-role">SM / Backend + IA</div>
+          <div class="team-hours">28h / semaine</div>
+          <div class="team-skills">
+            <span class="skill-tag">Scrum Master</span>
+            <span class="skill-tag">NestJS</span>
+            <span class="skill-tag">Claude API</span>
+            <span class="skill-tag">Prompt Eng.</span>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+          <div class="team-name">Youri</div>
+          <div class="team-role">Frontend Lead</div>
+          <div class="team-hours">22h / semaine</div>
+          <div class="team-skills">
+            <span class="skill-tag">React/Next.js</span>
+            <span class="skill-tag">UI/UX</span>
+            <span class="skill-tag">WebSocket</span>
+            <span class="skill-tag">Responsive</span>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">Y</div>
+          <div class="team-name">Yassir</div>
+          <div class="team-role">Frontend / UX + DevOps</div>
+          <div class="team-hours">22h / semaine</div>
+          <div class="team-skills">
+            <span class="skill-tag">Figma</span>
+            <span class="skill-tag">Accessibilite</span>
+            <span class="skill-tag">CI/CD</span>
+            <span class="skill-tag">Deploiement</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ARCHITECTURE ===== -->
+    <section id="architecture">
+      <div class="section-header fade-in">
+        <div class="section-tag">Technique</div>
+        <h2 class="section-title">Architecture Technique</h2>
+        <p class="section-desc">Stack moderne fullstack avec IA au coeur du systeme.</p>
+      </div>
+      <div class="arch-diagram fade-in">
+        <div class="arch-layer">
+          <div class="arch-layer-icon">&#128187;</div>
+          <div class="arch-layer-name">Frontend</div>
+          <div class="arch-layer-techs">
+            <span class="arch-tech">Next.js 14</span>
+            <span class="arch-tech">React 18</span>
+            <span class="arch-tech">TailwindCSS</span>
+            <span class="arch-tech">Zustand</span>
+            <span class="arch-tech">Socket.io Client</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&#10132;</div>
+        <div class="arch-layer">
+          <div class="arch-layer-icon">&#9881;</div>
+          <div class="arch-layer-name">Backend</div>
+          <div class="arch-layer-techs">
+            <span class="arch-tech">NestJS 10</span>
+            <span class="arch-tech">Prisma 5</span>
+            <span class="arch-tech">JWT Auth</span>
+            <span class="arch-tech">Socket.io Server</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&#10132;</div>
+        <div class="arch-layer">
+          <div class="arch-layer-icon">&#128451;</div>
+          <div class="arch-layer-name">Donnees</div>
+          <div class="arch-layer-techs">
+            <span class="arch-tech">PostgreSQL 16</span>
+            <span class="arch-tech">Redis 7 (Upstash)</span>
+            <span class="arch-tech">Neon (PostgreSQL)</span>
+          </div>
+        </div>
+        <div class="arch-arrow">&#10132;</div>
+        <div class="arch-layer">
+          <div class="arch-layer-icon">&#129302;</div>
+          <div class="arch-layer-name">IA</div>
+          <div class="arch-layer-techs">
+            <span class="arch-tech">Claude Sonnet</span>
+            <span class="arch-tech">Claude Haiku</span>
+            <span class="arch-tech">GPT-4o (fallback)</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-protocols fade-in">
+        <div class="protocol-badge">
+          <span class="protocol-dot" style="background: var(--green);"></span>
+          REST API &mdash; Operations stateless
+        </div>
+        <div class="protocol-badge">
+          <span class="protocol-dot" style="background: var(--accent);"></span>
+          WebSocket &mdash; Temps reel (&lt;200ms)
+        </div>
+        <div class="protocol-badge">
+          <span class="protocol-dot" style="background: var(--orange);"></span>
+          Streaming &mdash; Reponses IA
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GAME LOOP ===== -->
+    <section id="gameloop">
+      <div class="section-header fade-in">
+        <div class="section-tag">Moteur Universel</div>
+        <h2 class="section-title">Boucle de Jeu (6 Phases)</h2>
+        <p class="section-desc">Le meme moteur execute les 6 phases pour tous les scenarios via des Scenario Packs JSON.</p>
+      </div>
+      <div class="gameloop-wrapper fade-in">
+        <div class="gameloop-visual">
+          <div class="loop-circle">
+            <div class="loop-center">
+              <div class="loop-center-icon">&#129302;</div>
+              <div class="loop-center-label">Maitre du Jeu IA</div>
+            </div>
+            <div class="loop-phase phase-setup">
+              <span class="loop-phase-icon">&#127922;</span>
+              <span class="loop-phase-name">Setup</span>
+            </div>
+            <div class="loop-phase phase-narration">
+              <span class="loop-phase-icon">&#128214;</span>
+              <span class="loop-phase-name">Narration</span>
+            </div>
+            <div class="loop-phase phase-action">
+              <span class="loop-phase-icon">&#9889;</span>
+              <span class="loop-phase-name">Action</span>
+            </div>
+            <div class="loop-phase phase-resolution">
+              <span class="loop-phase-icon">&#9878;</span>
+              <span class="loop-phase-name">Resolution</span>
+            </div>
+            <div class="loop-phase phase-discussion">
+              <span class="loop-phase-icon">&#128172;</span>
+              <span class="loop-phase-name">Discussion</span>
+            </div>
+            <div class="loop-phase phase-finale">
+              <span class="loop-phase-icon">&#127942;</span>
+              <span class="loop-phase-name">Finale</span>
+            </div>
+          </div>
+        </div>
+        <div class="gameloop-details">
+          <div class="phase-detail" style="border-left-color: var(--accent);">
+            <div class="phase-detail-header">
+              <span>&#127922;</span>
+              <span class="phase-detail-name" style="color: var(--accent-light);">1. Setup</span>
+            </div>
+            <div class="phase-detail-desc">Distribution des roles, generation du contexte initial, briefing secret individuel.</div>
+          </div>
+          <div class="phase-detail" style="border-left-color: var(--blue);">
+            <div class="phase-detail-header">
+              <span>&#128214;</span>
+              <span class="phase-detail-name" style="color: var(--blue);">2. Narration</span>
+            </div>
+            <div class="phase-detail-desc">L'IA genere la scene narrative et propose les options d'action contextuelles.</div>
+          </div>
+          <div class="phase-detail" style="border-left-color: var(--orange);">
+            <div class="phase-detail-header">
+              <span>&#9889;</span>
+              <span class="phase-detail-name" style="color: var(--orange);">3. Action</span>
+            </div>
+            <div class="phase-detail-desc">Les joueurs soumettent leurs actions dans le timer. Votes, decisions, strategies.</div>
+          </div>
+          <div class="phase-detail" style="border-left-color: var(--pink);">
+            <div class="phase-detail-header">
+              <span>&#9878;</span>
+              <span class="phase-detail-name" style="color: var(--pink);">4. Resolution</span>
+            </div>
+            <div class="phase-detail-desc">L'IA resout les consequences de facon narrative. Impact sur l'etat du jeu.</div>
+          </div>
+          <div class="phase-detail" style="border-left-color: var(--green);">
+            <div class="phase-detail-header">
+              <span>&#128172;</span>
+              <span class="phase-detail-name" style="color: var(--green-light);">5. Discussion</span>
+            </div>
+            <div class="phase-detail-desc">Chat libre entre joueurs. Debats, alliances, strategies, bluff.</div>
+          </div>
+          <div class="phase-detail" style="border-left-color: var(--red);">
+            <div class="phase-detail-header">
+              <span>&#127942;</span>
+              <span class="phase-detail-name" style="color: var(--red);">6. Finale</span>
+            </div>
+            <div class="phase-detail-desc">Climax narratif, revelations des roles secrets, ecran de fin et statistiques.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCENARIOS ===== -->
+    <section id="scenarios">
+      <div class="section-header fade-in">
+        <div class="section-tag">Contenu</div>
+        <h2 class="section-title">Scenarios</h2>
+        <p class="section-desc">2 scenarios MVP + 3 prevus post-lancement, chacun defini par un Scenario Pack JSON.</p>
+      </div>
+      <div class="scenarios-grid fade-in">
+        <div class="scenario-card">
+          <span class="scenario-badge badge-mvp">MVP</span>
+          <div class="scenario-icon">&#9878;</div>
+          <div class="scenario-name">TRIBUNAL</div>
+          <div class="scenario-theme">Proces medieval avec roles caches</div>
+          <div class="scenario-mechanics">
+            <span class="mechanic-tag">Roles secrets</span>
+            <span class="mechanic-tag">Votes</span>
+            <span class="mechanic-tag">Temoignages</span>
+            <span class="mechanic-tag">Deduction sociale</span>
+            <span class="mechanic-tag">3-6 joueurs</span>
+          </div>
+        </div>
+        <div class="scenario-card">
+          <span class="scenario-badge badge-mvp">MVP</span>
+          <div class="scenario-icon">&#128674;</div>
+          <div class="scenario-name">DEEP</div>
+          <div class="scenario-theme">Survie en sous-marin avec jauges de ressources</div>
+          <div class="scenario-mechanics">
+            <span class="mechanic-tag">Jauges ressources</span>
+            <span class="mechanic-tag">Cooperation</span>
+            <span class="mechanic-tag">Dilemmes</span>
+            <span class="mechanic-tag">Timer critique</span>
+            <span class="mechanic-tag">2-5 joueurs</span>
+          </div>
+        </div>
+        <div class="scenario-card disabled">
+          <span class="scenario-badge badge-post">Post-MVP</span>
+          <div class="scenario-icon">&#9202;</div>
+          <div class="scenario-name">CHRONOS</div>
+          <div class="scenario-theme">Voyages temporels et paradoxes</div>
+          <div class="scenario-mechanics">
+            <span class="mechanic-tag">Timeline</span>
+            <span class="mechanic-tag">Paradoxes</span>
+          </div>
+        </div>
+        <div class="scenario-card disabled">
+          <span class="scenario-badge badge-post">Post-MVP</span>
+          <div class="scenario-icon">&#127917;</div>
+          <div class="scenario-name">MASCARADE</div>
+          <div class="scenario-theme">Bal masque et intrigues de cour</div>
+          <div class="scenario-mechanics">
+            <span class="mechanic-tag">Identites</span>
+            <span class="mechanic-tag">Intrigue</span>
+          </div>
+        </div>
+        <div class="scenario-card disabled">
+          <span class="scenario-badge badge-post">Post-MVP</span>
+          <div class="scenario-icon">&#128225;</div>
+          <div class="scenario-name">SIGNAL</div>
+          <div class="scenario-theme">Signal extraterrestre et premier contact</div>
+          <div class="scenario-mechanics">
+            <span class="mechanic-tag">Decodage</span>
+            <span class="mechanic-tag">Sci-fi</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RISKS ===== -->
+    <section id="risks">
+      <div class="section-header fade-in">
+        <div class="section-tag">Gestion des Risques</div>
+        <h2 class="section-title">Analyse des Risques</h2>
+        <p class="section-desc">19 risques identifies. Matrice probabilite/impact et top risques critiques.</p>
+      </div>
+      <div class="risk-grid fade-in">
+        <div class="risk-chart-container">
+          <div class="chart-title">Matrice Probabilite / Impact</div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="riskChart"></canvas>
+          </div>
+        </div>
+        <div class="risk-list">
+          <div class="risk-item risk-critical">
+            <div class="risk-item-header">
+              <span class="risk-item-name">RSQ-O02 : Depassement planning</span>
+              <span class="risk-score">Score: 16</span>
+            </div>
+            <div class="risk-mitigation">Marge de 5% seulement. Suivi strict de velocite, MoSCoW, buffers sprint.</div>
+          </div>
+          <div class="risk-item risk-critical">
+            <div class="risk-item-header">
+              <span class="risk-item-name">RSQ-T02 : Latence excessive IA</span>
+              <span class="risk-score">Score: 16</span>
+            </div>
+            <div class="risk-mitigation">Streaming, cache Redis, pre-generation, prompts optimises.</div>
+          </div>
+          <div class="risk-item risk-critical">
+            <div class="risk-item-header">
+              <span class="risk-item-name">RSQ-T01 : Qualite narrative IA</span>
+              <span class="risk-score">Score: 15</span>
+            </div>
+            <div class="risk-mitigation">Few-shot prompting, memoire contextuelle, tests narratifs.</div>
+          </div>
+          <div class="risk-item risk-high">
+            <div class="risk-item-header">
+              <span class="risk-item-name">Desynchronisation WebSocket</span>
+              <span class="risk-score">Score: 12</span>
+            </div>
+            <div class="risk-mitigation">Architecture server-authoritative, reconciliation d'etat.</div>
+          </div>
+          <div class="risk-item risk-high">
+            <div class="risk-item-header">
+              <span class="risk-item-name">API IA indisponible</span>
+              <span class="risk-score">Score: 12</span>
+            </div>
+            <div class="risk-mitigation">Fallback GPT-4o, mode degrade, queue de retry.</div>
+          </div>
+          <div class="risk-item risk-high">
+            <div class="risk-item-header">
+              <span class="risk-item-name">Failles securite (injection)</span>
+              <span class="risk-score">Score: 10</span>
+            </div>
+            <div class="risk-mitigation">Sanitisation inputs, CORS, rate limiting, audit securite.</div>
+          </div>
+          <div class="risk-item risk-medium">
+            <div class="risk-item-header">
+              <span class="risk-item-name">Scope creep</span>
+              <span class="risk-score">Score: 9</span>
+            </div>
+            <div class="risk-mitigation">MoSCoW strict, revue de sprint, PO discipline.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMPETITIVE ANALYSIS ===== -->
+    <section id="competitive">
+      <div class="section-header fade-in">
+        <div class="section-tag">Benchmark</div>
+        <h2 class="section-title">Analyse Concurrentielle</h2>
+        <p class="section-desc">9 concurrents analyses. MYTHOS se positionne comme le seul a combiner IA + multijoueur synchrone + narration + sessions courtes.</p>
+      </div>
+      <div class="chart-row fade-in">
+        <div class="chart-card">
+          <div class="chart-title">Radar : MYTHOS vs Concurrents</div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="radarChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Scores Globaux des Concurrents</div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="competitorChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BUDGET ===== -->
+    <section id="budget">
+      <div class="section-header fade-in">
+        <div class="section-tag">Finances</div>
+        <h2 class="section-title">Budget & Ressources</h2>
+        <p class="section-desc">Budget MVP maitrise grace aux tiers gratuits et a l'optimisation des couts IA.</p>
+      </div>
+      <div class="budget-grid fade-in">
+        <div>
+          <div class="budget-total">
+            <div class="budget-amount">~308&euro;</div>
+            <div class="budget-label">Budget total MVP</div>
+          </div>
+          <div style="margin-top: 20px;">
+            <div class="chart-card">
+              <div class="chart-title">Repartition du Budget</div>
+              <div class="chart-canvas-wrapper" style="height: 240px;">
+                <canvas id="budgetChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Allocation Heures / Semaine par Membre</div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="hoursChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KPIs ===== -->
+    <section id="kpis">
+      <div class="section-header fade-in">
+        <div class="section-tag">Metriques</div>
+        <h2 class="section-title">KPIs & Suivi</h2>
+        <p class="section-desc">Indicateurs cles pour le pilotage du projet et la qualite du produit.</p>
+      </div>
+      <div class="kpi-grid fade-in">
+        <div class="kpi-card">
+          <div class="kpi-icon">&#9889;</div>
+          <div class="kpi-name">Velocite Sprint</div>
+          <div class="kpi-value" style="color: var(--accent-light);">55 pts</div>
+          <div class="kpi-target">Cible : 35-45 story points / sprint</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 95%; background: var(--accent);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#129302;</div>
+          <div class="kpi-name">Latence IA (P95)</div>
+          <div class="kpi-value" style="color: var(--green-light);">&lt;3s</div>
+          <div class="kpi-target">Cible : &lt; 5 secondes (streaming)</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 90%; background: var(--green);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#128338;</div>
+          <div class="kpi-name">Latence WebSocket</div>
+          <div class="kpi-value" style="color: var(--blue);">&lt;150ms</div>
+          <div class="kpi-target">Cible : &lt; 200ms de latence</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 95%; background: var(--blue);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#128200;</div>
+          <div class="kpi-name">Uptime</div>
+          <div class="kpi-value" style="color: var(--green-light);">99.5%</div>
+          <div class="kpi-target">Cible : &gt; 99.5% disponibilite</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 99%; background: var(--green);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#128100;</div>
+          <div class="kpi-name">Sessions Concurrentes</div>
+          <div class="kpi-value" style="color: var(--orange);">50+</div>
+          <div class="kpi-target">Cible : 50 sessions simultanees</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 60%; background: var(--orange);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#128196;</div>
+          <div class="kpi-name">Couverture Tests</div>
+          <div class="kpi-value" style="color: var(--pink);">65%</div>
+          <div class="kpi-target">Cible : &gt; 80% code coverage</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 65%; background: var(--pink);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#127919;</div>
+          <div class="kpi-name">Satisfaction Joueur</div>
+          <div class="kpi-value" style="color: var(--accent-light);">4/5</div>
+          <div class="kpi-target">Cible : &gt; 4/5 en beta test</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 80%; background: var(--accent);"></div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#128176;</div>
+          <div class="kpi-name">Cout IA / Session</div>
+          <div class="kpi-value" style="color: var(--orange);">&lt;0.15&euro;</div>
+          <div class="kpi-target">Cible : &lt; 0.15 EUR par session</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 65%; background: var(--orange);"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BACKLOG ===== -->
+    <section id="backlog">
+      <div class="section-header fade-in">
+        <div class="section-tag">Fonctionnalites</div>
+        <h2 class="section-title">Backlog MVP</h2>
+        <p class="section-desc">42 user stories regroupees par epic. Priorisation MoSCoW.</p>
+      </div>
+      <div class="backlog-epics fade-in">
+        <div class="epic-group open">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#128274; Authentification <span class="epic-count">5 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Inscription email + mot de passe avec validation</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Connexion avec JWT et refresh token</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Gestion des sessions et deconnexion</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> OAuth Google / Discord</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Mot de passe oublie par email</div>
+          </div>
+        </div>
+        <div class="epic-group">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#127918; Gestion des Parties <span class="epic-count">8 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Creer une partie avec choix du scenario</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Rejoindre via code de partie</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Lobby en temps reel avec liste des joueurs</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Lancement de partie par le createur</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Gestion min/max joueurs par scenario</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Parametrage du temps par phase</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Spectateur mode</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Matchmaking automatique</div>
+          </div>
+        </div>
+        <div class="epic-group">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#129302; Moteur de Jeu IA <span class="epic-count">10 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Boucle de jeu 6 phases fonctionnelle</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Generation narrative IA en streaming</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Chargement des Scenario Packs JSON</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Distribution des roles avec briefings secrets</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Options d'action contextuelles generees par IA</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Resolution narrative des actions joueurs</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Timer par phase avec auto-resolution</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Memoire contextuelle multi-tours</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Fallback GPT-4o si Claude indisponible</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Ajustement dynamique de la difficulte</div>
+          </div>
+        </div>
+        <div class="epic-group">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#9878; TRIBUNAL (Scenario 1) <span class="epic-count">6 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Systeme de vote accuse/innocent</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Temoignages et contre-interrogatoires</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Roles : Juge, Avocat, Temoin, Accuse</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Revelation des roles secrets en finale</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Preuves et indices decouverts en cours</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Variantes de scenarios (3+ affaires)</div>
+          </div>
+        </div>
+        <div class="epic-group">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#128674; DEEP (Scenario 2) <span class="epic-count">5 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Jauges de ressources en temps reel (O2, energie, coque)</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Dilemmes cooperatifs avec impact sur jauges</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Evenements aleatoires (pannes, creatures)</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Systeme de reparations collaboratif</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Carte du sous-marin interactive</div>
+          </div>
+        </div>
+        <div class="epic-group">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#128172; Chat & Social <span class="epic-count">4 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Chat en temps reel durant les phases Discussion</div>
+            <div class="story-item"><span class="story-priority priority-must">Must</span> Messages prives entre joueurs (whisper)</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Reactions et emojis</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Historique des conversations post-partie</div>
+          </div>
+        </div>
+        <div class="epic-group">
+          <div class="epic-header" onclick="this.parentElement.classList.toggle('open')">
+            <span class="epic-name">&#128736; Administration <span class="epic-count">4 stories</span></span>
+            <span class="epic-arrow">&#9660;</span>
+          </div>
+          <div class="epic-stories">
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Dashboard admin avec stats globales</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Gestion utilisateurs et bans</div>
+            <div class="story-item"><span class="story-priority priority-should">Should</span> Monitoring des parties actives</div>
+            <div class="story-item"><span class="story-priority priority-could">Could</span> Configuration IA (modele, temperature, tokens)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KANBAN ===== -->
+    <section id="kanban">
+      <div class="section-header fade-in">
+        <div class="section-tag">Gestion de Projet</div>
+        <h2 class="section-title">Kanban Board</h2>
+        <p class="section-desc">Vue Sprint 3 (actuel). Glissez-deposez les cartes entre les colonnes.</p>
+      </div>
+      <div class="kanban-filters fade-in">
+        <button class="kanban-filter active" onclick="filterKanban('all', this)">Tous</button>
+        <button class="kanban-filter" onclick="filterKanban('frontend', this)">Frontend</button>
+        <button class="kanban-filter" onclick="filterKanban('backend', this)">Backend</button>
+        <button class="kanban-filter" onclick="filterKanban('ia', this)">IA</button>
+        <button class="kanban-filter" onclick="filterKanban('devops', this)">DevOps</button>
+        <button class="kanban-filter" onclick="filterKanban('design', this)">Design</button>
+        <button class="kanban-filter" onclick="filterKanban('game', this)">Game</button>
+      </div>
+      <div class="kanban-board fade-in">
+        <!-- BACKLOG -->
+        <div class="kanban-column" data-col="backlog" ondrop="dropCard(event)" ondragover="event.preventDefault()">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title"><span class="kanban-col-dot" style="background: var(--text-muted);"></span> Backlog</span>
+            <span class="kanban-col-count" id="count-backlog">1</span>
+          </div>
+          <div class="kanban-cards">
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="design">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-design">Design</span>
+              </div>
+              <div class="kanban-card-title">Maquettes Figma ecran de fin</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">3 pts</span>
+                <span class="kanban-card-sprint">Sprint 3</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">Y</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- A FAIRE -->
+        <div class="kanban-column" data-col="todo" ondrop="dropCard(event)" ondragover="event.preventDefault()">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title"><span class="kanban-col-dot" style="background: var(--blue);"></span> A Faire</span>
+            <span class="kanban-col-count" id="count-todo">0</span>
+          </div>
+          <div class="kanban-cards">
+          </div>
+        </div>
+        <!-- EN COURS -->
+        <div class="kanban-column" data-col="doing" ondrop="dropCard(event)" ondragover="event.preventDefault()">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title"><span class="kanban-col-dot" style="background: var(--orange);"></span> En Cours</span>
+            <span class="kanban-col-count" id="count-doing">1</span>
+          </div>
+          <div class="kanban-cards">
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend,backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Integration polish & bug fixes</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 3</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- TERMINE -->
+        <div class="kanban-column" data-col="done" ondrop="dropCard(event)" ondragover="event.preventDefault()">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title"><span class="kanban-col-dot" style="background: var(--green);"></span> Termine</span>
+            <span class="kanban-col-count" id="count-done">25</span>
+          </div>
+          <div class="kanban-cards">
+            <!-- ===== SPRINT 0 (Sem 1-2, Jan 6-17) ===== -->
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="devops">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-devops">DevOps</span>
+              </div>
+              <div class="kanban-card-title">Setup repo monorepo + structure projet</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">3 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="design">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-design">Design</span>
+              </div>
+              <div class="kanban-card-title">Maquettes Figma : accueil, lobby, auth</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="design">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-design">Design</span>
+              </div>
+              <div class="kanban-card-title">Design system + composants UI de base</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Schema Prisma + migrations DB</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">3 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Backend NestJS core + module principal</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">3 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="ia">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-ia">IA</span>
+              </div>
+              <div class="kanban-card-title">POC integration Claude API avec streaming narratif</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Authentification JWT (register + login) + Google OAuth</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Module utilisateurs (profil, stats, leaderboard)</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">3 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend,design">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+                <span class="kanban-label label-design">Design</span>
+              </div>
+              <div class="kanban-card-title">Pages auth : login + inscription + Google OAuth</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Landing page hero + sections + footer</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 0</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <!-- ===== SPRINT 1 (Sem 3-4, Jan 20-31) ===== -->
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">API REST : CRUD parties (create, join, list, leave)</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Cache service in-memory pour sessions et game state</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">3 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">WebSocket : connexion, rooms, broadcast</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">8 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Page de lobby en temps reel</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Dashboard utilisateur (accueil, mes parties, profil)</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Pages catalogue et details scenarios</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="devops">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-devops">DevOps</span>
+              </div>
+              <div class="kanban-card-title">CI/CD deploiement Vercel + Render</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 1</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">Y</div>
+              </div>
+            </div>
+            <!-- ===== SPRINT 2 (Sem 5-6, Feb 2-13) ===== -->
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="game">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-game">Game</span>
+              </div>
+              <div class="kanban-card-title">Scenario Pack JSON : TRIBUNAL</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">8 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">K</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="game">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-game">Game</span>
+              </div>
+              <div class="kanban-card-title">Scenario Pack JSON : DEEP</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">8 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">K</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="game,ia">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-game">Game</span>
+                <span class="kanban-label label-ia">IA</span>
+              </div>
+              <div class="kanban-card-title">Boucle de jeu 6 phases (moteur)</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">13 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">K</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Interface de jeu (narration + actions + voting)</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">8 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Chat en temps reel in-game + whisper</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Notifications temps reel via WebSocket</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="backend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-backend">Backend</span>
+              </div>
+              <div class="kanban-card-title">Dashboard admin (stats, gestion users, ban)</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">S</div>
+              </div>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="dragCard(event)" data-labels="frontend">
+              <div class="kanban-card-labels">
+                <span class="kanban-label label-frontend">Frontend</span>
+              </div>
+              <div class="kanban-card-title">Page admin frontend avec stats et ban system</div>
+              <div class="kanban-card-footer">
+                <span class="kanban-card-points">5 pts</span>
+                <span class="kanban-card-sprint">Sprint 2</span>
+                <div class="kanban-card-avatar" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">Y</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMPLIANCE ===== -->
+    <section id="compliance">
+      <div class="section-header fade-in">
+        <div class="section-tag">Conformite</div>
+        <h2 class="section-title">Standards & Reglementation</h2>
+        <p class="section-desc">Conformite aux normes europeennes et francaises applicables.</p>
+      </div>
+      <div class="compliance-grid fade-in">
+        <div class="compliance-card">
+          <div class="compliance-icon">&#128274;</div>
+          <div class="compliance-name">RGPD</div>
+          <div class="compliance-desc">Protection des donnees personnelles. Privacy-by-design, consentement explicite, droit a l'oubli.</div>
+          <div class="compliance-status">Integre des le Sprint 0</div>
+        </div>
+        <div class="compliance-card">
+          <div class="compliance-icon">&#9855;</div>
+          <div class="compliance-name">WCAG 2.1 AA</div>
+          <div class="compliance-desc">Accessibilite web. Navigation clavier, ARIA, contrastes, lecteurs d'ecran.</div>
+          <div class="compliance-status">Deploye</div>
+        </div>
+        <div class="compliance-card">
+          <div class="compliance-icon">&#127467;&#127479;</div>
+          <div class="compliance-name">RGAA 4.1</div>
+          <div class="compliance-desc">Referentiel general d'amelioration de l'accessibilite (France).</div>
+          <div class="compliance-status">Aligne avec WCAG 2.1</div>
+        </div>
+        <div class="compliance-card">
+          <div class="compliance-icon">&#127793;</div>
+          <div class="compliance-name">GreenIT / RGESN</div>
+          <div class="compliance-desc">Numerique durable. Optimisation performance, transferts minimaux, eco-conception.</div>
+          <div class="compliance-status">Monitoring continu</div>
+        </div>
+        <div class="compliance-card">
+          <div class="compliance-icon">&#128218;</div>
+          <div class="compliance-name">RNCP38822</div>
+          <div class="compliance-desc">Bloc 1 : Planification et organisation du developpement d'une application.</div>
+          <div class="compliance-status">Referentiel certification</div>
+        </div>
+        <div class="compliance-card">
+          <div class="compliance-icon">&#9888;</div>
+          <div class="compliance-name">ISO 31000</div>
+          <div class="compliance-desc">Methodologie de gestion des risques. Matrice probabilite/impact, plans de contingence.</div>
+          <div class="compliance-status">Appliquee</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ===== SCROLL SPY =====
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+    function updateActiveNav() {
+      let current = '';
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= 120) {
+          current = section.id;
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+
+    // ===== FADE IN ANIMATION =====
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    fadeEls.forEach(el => observer.observe(el));
+
+    // ===== CLOSE SIDEBAR ON MOBILE NAV CLICK =====
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          document.querySelector('.sidebar').classList.remove('open');
+        }
+      });
+    });
+
+    // ===== KANBAN DRAG & DROP =====
+    let draggedCard = null;
+
+    function dragCard(e) {
+      draggedCard = e.target.closest('.kanban-card');
+      draggedCard.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function dropCard(e) {
+      e.preventDefault();
+      if (!draggedCard) return;
+      const col = e.target.closest('.kanban-column');
+      if (col) {
+        col.querySelector('.kanban-cards').appendChild(draggedCard);
+        draggedCard.classList.remove('dragging');
+        updateCounts();
+      }
+      draggedCard = null;
+    }
+
+    function updateCounts() {
+      document.querySelectorAll('.kanban-column').forEach(col => {
+        const name = col.dataset.col;
+        const visibleCards = col.querySelectorAll('.kanban-card:not([style*="display: none"])').length;
+        const counter = document.getElementById('count-' + name);
+        if (counter) counter.textContent = visibleCards;
+      });
+    }
+
+    function filterKanban(label, btn) {
+      document.querySelectorAll('.kanban-filter').forEach(f => f.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.kanban-card').forEach(card => {
+        if (label === 'all') {
+          card.style.display = '';
+        } else {
+          const labels = card.dataset.labels || '';
+          card.style.display = labels.includes(label) ? '' : 'none';
+        }
+      });
+      updateCounts();
+    }
+
+    // ===== CHART.JS CONFIG =====
+    Chart.defaults.color = '#a0a3b1';
+    Chart.defaults.borderColor = '#2d3140';
+    Chart.defaults.font.family = 'Inter';
+
+    // --- Risk Scatter Chart ---
+    new Chart(document.getElementById('riskChart'), {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Critique',
+          data: [
+            { x: 4, y: 4, r: 'Depassement planning' },
+            { x: 4, y: 4, r: 'Latence IA' },
+            { x: 3, y: 5, r: 'Qualite narrative' }
+          ],
+          backgroundColor: 'rgba(255, 107, 107, 0.7)',
+          pointRadius: 12,
+          pointHoverRadius: 16
+        }, {
+          label: 'Eleve',
+          data: [
+            { x: 3, y: 4, r: 'Desync WebSocket' },
+            { x: 3, y: 4, r: 'API indisponible' },
+            { x: 2, y: 5, r: 'Failles securite' },
+            { x: 3, y: 3, r: 'Complexite moteur' }
+          ],
+          backgroundColor: 'rgba(253, 203, 110, 0.7)',
+          pointRadius: 10,
+          pointHoverRadius: 14
+        }, {
+          label: 'Moyen',
+          data: [
+            { x: 3, y: 3, r: 'Scope creep' },
+            { x: 2, y: 3, r: 'Burnout' },
+            { x: 2, y: 4, r: 'Moderation IA' },
+            { x: 2, y: 2, r: 'Cout API' }
+          ],
+          backgroundColor: 'rgba(255, 234, 167, 0.7)',
+          pointRadius: 8,
+          pointHoverRadius: 12
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.raw.r} (P:${ctx.raw.x}, I:${ctx.raw.y})`
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Probabilite', font: { weight: 'bold' } },
+            min: 0, max: 5,
+            grid: { color: '#2d3140' }
+          },
+          y: {
+            title: { display: true, text: 'Impact', font: { weight: 'bold' } },
+            min: 0, max: 5,
+            grid: { color: '#2d3140' }
+          }
+        }
+      }
+    });
+
+    // --- Radar Chart ---
+    new Chart(document.getElementById('radarChart'), {
+      type: 'radar',
+      data: {
+        labels: ['IA Game Master', 'Multijoueur Sync', 'Narration', 'Sessions Courtes', 'Modularite', 'Accessibilite'],
+        datasets: [{
+          label: 'MYTHOS',
+          data: [5, 5, 5, 5, 5, 4],
+          backgroundColor: 'rgba(108, 92, 231, 0.2)',
+          borderColor: '#6c5ce7',
+          borderWidth: 2,
+          pointBackgroundColor: '#6c5ce7'
+        }, {
+          label: 'AI Dungeon',
+          data: [4, 1, 4, 2, 2, 2],
+          backgroundColor: 'rgba(116, 185, 255, 0.1)',
+          borderColor: '#74b9ff',
+          borderWidth: 1,
+          pointBackgroundColor: '#74b9ff'
+        }, {
+          label: 'Among Us',
+          data: [0, 5, 1, 4, 1, 3],
+          backgroundColor: 'rgba(253, 121, 168, 0.1)',
+          borderColor: '#fd79a8',
+          borderWidth: 1,
+          pointBackgroundColor: '#fd79a8'
+        }, {
+          label: 'D&D Beyond',
+          data: [0, 3, 5, 1, 2, 3],
+          backgroundColor: 'rgba(0, 184, 148, 0.1)',
+          borderColor: '#00b894',
+          borderWidth: 1,
+          pointBackgroundColor: '#00b894'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 5,
+            grid: { color: '#2d3140' },
+            angleLines: { color: '#2d3140' },
+            pointLabels: { font: { size: 11, weight: '600' } }
+          }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } }
+        }
+      }
+    });
+
+    // --- Competitor Bar Chart ---
+    new Chart(document.getElementById('competitorChart'), {
+      type: 'bar',
+      data: {
+        labels: ['MYTHOS', 'AI Dungeon', 'Among Us', 'D&D Beyond', 'Character.AI', 'Werewolf', 'Storium', 'Novel AI', 'Hidden Agenda'],
+        datasets: [{
+          label: 'Score Global /5',
+          data: [4.5, 3.2, 3.0, 2.9, 2.8, 2.7, 2.4, 2.5, 2.2],
+          backgroundColor: [
+            'rgba(108, 92, 231, 0.8)',
+            'rgba(116, 185, 255, 0.6)',
+            'rgba(253, 121, 168, 0.6)',
+            'rgba(0, 184, 148, 0.6)',
+            'rgba(253, 203, 110, 0.6)',
+            'rgba(255, 107, 107, 0.6)',
+            'rgba(162, 155, 254, 0.6)',
+            'rgba(85, 239, 196, 0.6)',
+            'rgba(107, 110, 125, 0.6)'
+          ],
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 5,
+            grid: { color: '#2d3140' }
+          },
+          y: {
+            grid: { display: false }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    // --- Budget Doughnut ---
+    new Chart(document.getElementById('budgetChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['API IA (Claude)', 'Infrastructure', 'Domaine', 'Contingence (20%)'],
+        datasets: [{
+          data: [120, 30, 15, 51],
+          backgroundColor: [
+            'rgba(108, 92, 231, 0.8)',
+            'rgba(116, 185, 255, 0.8)',
+            'rgba(0, 184, 148, 0.8)',
+            'rgba(253, 203, 110, 0.8)'
+          ],
+          borderWidth: 0,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { padding: 12, usePointStyle: true, font: { size: 11 } }
+          }
+        }
+      }
+    });
+
+    // --- Hours Bar Chart ---
+    new Chart(document.getElementById('hoursChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Kays', 'Samy', 'Youri', 'Yassir'],
+        datasets: [{
+          label: 'Heures / Semaine',
+          data: [25, 28, 22, 22],
+          backgroundColor: [
+            'rgba(108, 92, 231, 0.8)',
+            'rgba(0, 184, 148, 0.8)',
+            'rgba(116, 185, 255, 0.8)',
+            'rgba(253, 121, 168, 0.8)'
+          ],
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 35,
+            grid: { color: '#2d3140' },
+            title: { display: true, text: 'Heures', font: { weight: 'bold' } }
+          },
+          x: {
+            grid: { display: false }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.parsed.y}h / semaine`
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
