@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend to Render
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+        env:
+          RENDER_DEPLOY_HOOK_BACKEND: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
+        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: frontend
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  post-deploy:
+    name: Post-deploy health check
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+
+    steps:
+      - name: Wait for deploy propagation
+        run: sleep 30
+
+      - name: Health check backend
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" https://api.mythos.app/health)
+          if [ "$status" != "200" ]; then
+            echo "Backend health check failed with status $status"
+            exit 1
+          fi
+          echo "Backend is healthy"
+
+      - name: Health check frontend
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" https://mythos.app)
+          if [ "$status" != "200" ]; then
+            echo "Frontend health check failed with status $status"
+            exit 1
+          fi
+          echo "Frontend is healthy"
