@@ -8,12 +8,15 @@ jobs:
   deploy-backend:
     name: Deploy Backend to Render
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    if: vars.DEPLOY_ENABLED == 'true'
 
     steps:
       - name: Trigger Render deploy
-        if: secrets.RENDER_DEPLOY_HOOK_BACKEND != ''
         run: |
+          if [ -z "$RENDER_HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK_BACKEND secret not set, skipping"
+            exit 0
+          fi
           curl -X POST "$RENDER_HOOK" \
             -H "Content-Type: application/json" \
             --fail --silent --show-error
@@ -23,7 +26,7 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to Vercel
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    if: vars.DEPLOY_ENABLED == 'true'
 
     steps:
       - uses: actions/checkout@v4
